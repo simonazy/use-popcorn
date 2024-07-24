@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
 import Loader from "./Loader";
+import { useKey } from "../hook/useKey";
 
 const KEY = "dcbc0845";
 
@@ -10,7 +11,7 @@ export default function MovieDetails({
   addToWatched,
   watched,
 }) {
-  const [movie, setMovie] = useState("");
+  const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
@@ -35,6 +36,8 @@ export default function MovieDetails({
     [selectedId]
   );
 
+  useKey("escape", onCloseMovie);
+
   //destructure and rename
   const {
     Title: title,
@@ -52,12 +55,26 @@ export default function MovieDetails({
   const newWatchedMovie = {
     title,
     imdbRating,
-    runtime: Number(runtime.split(" ").at(0)),
+    runtime: runtime,
     poster,
     year,
     imdbID: selectedId,
     userRating,
   };
+
+  console.log(runtime);
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Movie | ${title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+      }; //cleanup function
+    },
+    [title]
+  );
 
   return (
     <div className="details">
@@ -82,16 +99,32 @@ export default function MovieDetails({
           </header>
           <section>
             <div className="rating">
-              <>
-                <StarRating />
-                <button
-                  className="btn-add"
-                  onClick={() => addToWatched(newWatchedMovie)}
-                >
-                  +Add to list
-                </button>
-              </>
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    userRating={userRating}
+                    setUserRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button
+                      className="btn-add"
+                      onClick={() => addToWatched(newWatchedMovie)}
+                    >
+                      +Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>
+                  You rated the movie with {watchedUserRating} <span>⭐️</span>
+                </p>
+              )}
             </div>
+            <p>
+              <em>{plot}</em>
+            </p>
+            <p>Starring {actors}</p>
+            <p>Directed by {director}</p>
           </section>
         </>
       )}

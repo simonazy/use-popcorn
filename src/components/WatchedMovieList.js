@@ -7,7 +7,7 @@ export default function WatchedMovieList({ watched, onDeleteWatchedMovie }) {
         <WatchedMovie
           movie={w}
           key={w.imdbID}
-          onDeleteWatched={onDeleteWatchedMovie}
+          onDeleteWatchedMovie={onDeleteWatchedMovie}
         />
       ))}
     </ul>

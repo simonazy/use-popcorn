@@ -20,7 +20,10 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [watched, setWatchedMovies] = useState([]);
+  const [watched, setWatchedMovies] = useState(function () {
+    const storedValue = localStorage.getItem("watched");
+    return JSON.parse(storedValue);
+  });
   const [selectedId, setSelectedId] = useState("");
 
   function handleSelectMovie(id) {
@@ -37,6 +40,13 @@ function App() {
   function handleDeleteWatchedMovie(id) {
     setWatchedMovies(() => watched.filter((w) => w.imdbID !== id));
   }
+
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   useEffect(
     function () {
@@ -95,10 +105,11 @@ function App() {
               selectedId={selectedId}
               onCloseMovie={handleCloseMovie}
               addToWatched={handleAddToWatched}
+              watched={watched}
             />
           ) : (
             <>
-              <WatchedSummary />
+              <WatchedSummary watched={watched} />
               <WatchedMovieList
                 watched={watched}
                 onAddWatchedMovie={handleAddToWatched}
